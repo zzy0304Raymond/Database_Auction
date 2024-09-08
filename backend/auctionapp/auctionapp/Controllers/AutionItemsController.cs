@@ -260,7 +260,7 @@ namespace auctionapp.Controllers
                     // 生成 DTO，返回找到的第一个符合条件的物品
                     var dto = new DelDto
                     {
-                        itemId = result.ItemId?? 0,
+                        itemId = result.ItemId ?? 0,
                         userId = result.CurrentHighestBidUserId ?? 0
                     };
                     return Ok(dto);
@@ -350,7 +350,7 @@ namespace auctionapp.Controllers
             {
                 // 使用 ToLower() 或 ToUpper() 与数据库比较时忽略大小写
                 var recommendedItems = await _context.Items
-                    .Where(item => item.Category != null && item.Category.ToLower() == category.ToLower())
+                    .Where(item => item.Category != null && item.Category.ToLower() == category.ToLower() && item.Valid != false)
                     .Select(item => new
                     {
                         id = item.Itemid,
@@ -380,7 +380,7 @@ namespace auctionapp.Controllers
             try
             {
                 // 确保 itemId 与 Bidrecord 中的字段类型匹配，这里假设是 string 类型
-                var bidHistory = await _context.Bidrecords.Include(b=>b.Auction)
+                var bidHistory = await _context.Bidrecords.Include(b => b.Auction)
                     .Where(record => record.Auction.Itemid == itemId)
                     .Select(record => new
                     {
