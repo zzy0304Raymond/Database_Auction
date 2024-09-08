@@ -75,10 +75,10 @@ namespace auctionapp.Controllers
             {
                 transaction.Status = "1"; // 更新交易状态为 "1" 表示已支付
                 await _context.SaveChangesAsync();
-
+                var maxPaymentId = await _context.Payments.MaxAsync(p => (decimal?)p.Paymentid) ?? 0;
                 var payment = new Payment
                 {
-                    Paymentid = await _context.Payments.MaxAsync(p => (decimal?)p.Paymentid) ?? 0 + 1,
+                    Paymentid = maxPaymentId + 1,
                     Transactionid = transaction.Transactionid,
                     Amount = transaction.Amount,
                     Paymenttime = DateTime.UtcNow,
