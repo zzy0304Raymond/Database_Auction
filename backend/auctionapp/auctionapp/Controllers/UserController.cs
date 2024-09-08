@@ -174,6 +174,8 @@ namespace auctionapp.Controllers
                 {
                     id = br.Bidid,
                     itemId = br.Auction.Item.Itemid, // 如果 Auction 或 Item 为 null，则ItemId为0
+                    itemName = br.Auction.Item.Itemname,
+                    currentHighestBid = (decimal)br.Auction.Currenthighestbid,
                     amount = (decimal)br.Bidamount,
                     timestamp = br.Bidtime.HasValue ? br.Bidtime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : null // 格式化为 ISO 8601 格式
                 })
@@ -326,6 +328,8 @@ namespace auctionapp.Controllers
         {
             public decimal id { get; set; }
             public decimal itemId { get; set; }
+            public string itemName { get; set; }
+            public decimal currentHighestBid { get; set; }
             public decimal amount { get; set; }
             public string timestamp { get; set; }
         }
