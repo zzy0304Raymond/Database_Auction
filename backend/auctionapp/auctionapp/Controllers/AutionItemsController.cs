@@ -240,7 +240,7 @@ namespace auctionapp.Controllers
                 {    // 创建新的交易记录
                     var transaction = new Transaction
                     {
-                        Transactionid = await _context.Transactions.MaxAsync(t => (decimal?)t.Transactionid) ?? 0 + 1, // 生成新的 TransactionId
+                        Transactionid = (await _context.Transactions.MaxAsync(t => (decimal?)t.Transactionid) ?? 0) + 1, // 生成新的 TransactionId
                         Auctionid = result.AuctionId,
                         Buyeruserid = result.CurrentHighestBidUserId,
                         Selleruserid = 0,
