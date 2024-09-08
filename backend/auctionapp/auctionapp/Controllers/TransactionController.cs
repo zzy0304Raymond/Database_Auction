@@ -24,14 +24,14 @@ namespace auctionapp.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<IEnumerable<TransactionDto>>> createTran(decimal userId)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest("Transaction is not availble!");
             }
             try
             {
                 System.Console.WriteLine(userId);
-                if(!_context.Transactions.Any())
+                if (!_context.Transactions.Any())
                 {
                     return BadRequest("No vaild Transaction");
                 }
@@ -56,16 +56,83 @@ namespace auctionapp.Controllers
 
         }
 
+        // POST: /api/transaction/afterpay/{transactionid}
+        [HttpPost("afterpay/{transactionid}")]
+        public async Task<ActionResult> AfterPay(decimal transactionid, [FromBody] PaymentDto paymentDto)
+        {
+            var transaction = await _context.Transactions
+                .FirstOrDefaultAsync(t => t.Transactionid == transactionid);
+
+            if (transaction == null)
+            {
+                return NotFound(new { message = "Transaction not found." });
+            }
+
+            try
+            {
+                transaction.Status = "1"; // 更新交易状态为 "1" 表示已支付
+                await _context.SaveChangesAsync();
+
+                var payment = new Payment
+                {
+                    Paymentid = await _context.Payments.MaxAsync(p => (decimal?)p.Paymentid) ?? 0 + 1,
+                    Transactionid = transaction.Transactionid,
+                    Amount = transaction.Amount,
+                    Paymenttime = DateTime.UtcNow,
+                    Paymentmethod = paymentDto.PaymentMethod
+                };
+
+                _context.Payments.Add(payment);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Payment completed and recorded." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing the payment.", error = ex.Message });
+            }
+        }
+
+        // GET: /api/transaction/cancel/{transactionid}
+        [HttpGet("cancel/{transactionid}")]
+        public async Task<ActionResult> CancelTransaction(decimal transactionid)
+        {
+            // 查找指定的 Transaction
+            var transaction = await _context.Transactions
+                .FirstOrDefaultAsync(t => t.Transactionid == transactionid);
+
+            if (transaction == null)
+            {
+                return NotFound(new { message = "Transaction not found." });
+            }
+
+            try
+            {
+                // 更新交易状态为 "2" 表示已取消
+                transaction.Status = "2";
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Transaction has been cancelled." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while cancelling the transaction.", error = ex.Message });
+            }
+        }
+
 
         public struct TransactionDto
         {
-            public string userName {  get; set; }
+            public string userName { get; set; }
             public string itemName { get; set; }
-            public decimal price    {  get; set; }
-
-
+            public decimal price { get; set; }
 
         }
 
+        // 用于接收支付方式
+        public class PaymentDto
+        {
+            public string PaymentMethod { get; set; } = "Online"; // 默认支付方式
+        }
     }
 }
