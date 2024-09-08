@@ -39,6 +39,7 @@ namespace auctionapp.Controllers
                     .Where(t => t.Buyeruserid == userId)
                     .Select(t => new TransactionDto
                     {
+                        transactionID = t.Transactionid,
                         userName = t.Buyeruser.Username,
                         itemID = (decimal)t.Auction.Item.Itemid,
                         itemName = t.Auction.Item.Itemname,
@@ -125,6 +126,7 @@ namespace auctionapp.Controllers
 
         public struct TransactionDto
         {
+            public decimal transactionID { get; set; }
             public string userName { get; set; }
             public decimal itemID { get; set; }
             public string itemName { get; set; }
