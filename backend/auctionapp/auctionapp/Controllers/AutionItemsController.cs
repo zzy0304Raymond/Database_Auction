@@ -228,19 +228,40 @@ namespace auctionapp.Controllers
                     .Where(a => a.Endtime < DateTime.Now && a.Item.Valid == true)
                     .Select(a => new
                     {
-                        a.Itemid,
-                        a.Currenthighestbiduserid
+                        AuctionId = a.Auctionid,
+                        ItemId = a.Itemid,
+                        CurrentHighestBidUserId = a.Currenthighestbiduserid,
+                        CurrentHighestBid = a.Currenthighestbid
                     })
                     .FirstOrDefaultAsync();
 
                 System.Console.WriteLine(result);
                 if (result != null)
-                {
+                {    // 创建新的交易记录
+                    var transaction = new Transaction
+                    {
+                        Transactionid = await _context.Transactions.MaxAsync(t => (decimal?)t.Transactionid) ?? 0 + 1, // 生成新的 TransactionId
+                        Auctionid = result.AuctionId,
+                        Buyeruserid = result.CurrentHighestBidUserId,
+                        Selleruserid = 0,
+                        //await _context.Items
+                        //    .Where(i => i.Itemid == result.ItemId)
+                        //    .Select(i => i.Users.FirstOrDefault().Userid)
+                        //    .FirstOrDefaultAsync(), // 假设卖家是第一个关联的用户
+                        Transactiontime = DateTime.UtcNow,
+                        Amount = result.CurrentHighestBid,
+                        Status = "0" // 设置订单状态为待支付
+                    };
+
+                    // 将交易写入数据库
+                    _context.Transactions.Add(transaction);
+                    await _context.SaveChangesAsync();
+
                     // 生成 DTO，返回找到的第一个符合条件的物品
                     var dto = new DelDto
                     {
-                        itemId = result.Itemid ?? 0,
-                        userId = result.Currenthighestbiduserid ?? 0
+                        itemId = result.ItemId?? 0,
+                        userId = result.CurrentHighestBidUserId ?? 0
                     };
                     return Ok(dto);
                 }
