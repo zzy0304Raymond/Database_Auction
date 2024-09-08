@@ -40,6 +40,7 @@ namespace auctionapp.Controllers
                     .Select(t => new TransactionDto
                     {
                         userName = t.Buyeruser.Username,
+                        itemID = (decimal)t.Auction.Item.Itemid,
                         itemName = t.Auction.Item.Itemname,
                         price = t.Amount ?? 0,
                         status = t.Status
@@ -125,9 +126,9 @@ namespace auctionapp.Controllers
         public struct TransactionDto
         {
             public string userName { get; set; }
+            public decimal itemID { get; set; }
             public string itemName { get; set; }
             public decimal price { get; set; }
-
             public string status { get; set; }
 
         }
