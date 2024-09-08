@@ -214,7 +214,7 @@ namespace auctionapp.Controllers
         //轮询
         //Get; api/auction-items/confirm
         [HttpGet("confirm")]
-        public async Task<ActionResult<DelDto>> comfirmDel()
+        public async Task<ActionResult<DelDto>> ConfirmDel()
         {
             if (!ModelState.IsValid)
             {
@@ -223,40 +223,43 @@ namespace auctionapp.Controllers
 
             try
             {
-                var validItems = await _context.Items
-                        .Include( item =>  item.Auctions)
-                        .Where(item => item.Valid == true)
-                        .ToListAsync();
-
-                var firstValidItemId = validItems
-                    .Where(item => item.Auctions.Any(auction => auction.Endtime < DateTime.Now))
-                    .Select(item => item.Itemid);
-
-                if (firstValidItemId.Any())
-                {
-                    var auc = _context.Auctions.FirstOrDefaultAsync(a => a.Itemid == firstValidItemId.FirstOrDefault());
-                    var Dto = new DelDto
+                // 直接在数据库中查找第一个符合条件的物品和相关拍卖信息
+                var result = await _context.Auctions
+                    .Where(a => a.Endtime < DateTime.Now && a.Item.Valid == true)
+                    .Select(a => new
                     {
-                        itemId = firstValidItemId.FirstOrDefault(),
-                        userId = auc.Result.Currenthighestbiduserid??0
+                        a.Itemid,
+                        a.Currenthighestbiduserid
+                    })
+                    .FirstOrDefaultAsync();
+
+                System.Console.WriteLine(result);
+                if (result != null)
+                {
+                    // 生成 DTO，返回找到的第一个符合条件的物品
+                    var dto = new DelDto
+                    {
+                        itemId = result.Itemid ?? 0,
+                        userId = result.Currenthighestbiduserid ?? 0
                     };
-                    return Ok(Dto);
+                    return Ok(dto);
                 }
                 else
                 {
-                    var Dto = new DelDto
+                    // 如果没有符合条件的物品
+                    var dto = new DelDto
                     {
                         itemId = -1
                     };
-                    return Ok(Dto);
+                    return Ok(dto);
                 }
-                
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { message = ex.Message });
             }
         }
+
 
 
 
