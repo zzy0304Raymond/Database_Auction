@@ -23,6 +23,8 @@
             <div v-if="!isEditing">
               <p>Username: {{ user.username }}</p>
               <p>Email: {{ user.email }}</p>
+              <p>Phone: {{ user.phone }}</p>
+              <p>Address: {{ user.address }}</p>
             </div>
             <el-form v-else :model="editForm"> <!-- 编辑表单 -->
               <el-form-item label="Username">
@@ -30,6 +32,12 @@
               </el-form-item>
               <el-form-item label="Email">
                 <el-input v-model="editForm.email"></el-input> 
+              </el-form-item>
+              <el-form-item label="Phone">
+                <el-input v-model="editForm.phone"></el-input> 
+              </el-form-item>
+              <el-form-item label="Address">
+                <el-input v-model="editForm.address"></el-input> 
               </el-form-item>
               <el-button type="primary" @click="saveProfile">Save</el-button> <!-- 保存按钮 -->
             </el-form>
@@ -76,6 +84,30 @@
               </template>
             </el-table-column>
 
+          </el-table>
+        </template>
+      </el-skeleton>
+    </el-card>
+
+        <!-- 购物车卡片 -->
+        <el-card class="cart-card">
+      <h2>Your Cart</h2>
+      <el-skeleton :loading="loading" animated>
+        <template #default>
+          <el-table :data="cartItems" style="width: 100%" align="center" header-align="center">
+            <el-table-column prop="itemName" label="Item Name" width="180" align="center">
+              <template #default="scope">
+                <el-link @click="goToItemDetail(scope.row.itemId)">
+                  {{ scope.row.itemName }}
+                </el-link>
+              </template>
+            </el-table-column>
+            <el-table-column prop="price" label="Price" width="100" align="center"></el-table-column>
+            <el-table-column label="Action" width="150" align="center">
+              <template #default="scope">
+                <el-button @click="removeFromCart(scope.row)" type="danger" size="small" align="center">Remove</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </template>
       </el-skeleton>
