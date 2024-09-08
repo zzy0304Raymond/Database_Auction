@@ -47,47 +47,35 @@
         </template>
         <template #default>
           <el-table :data="bids" style="width: 100%" align="center" header-align="center">
-            <!-- Item ID -->
-            <el-table-column prop="itemId" label="Item ID" width="180" align="center"></el-table-column>
-            
-            <!-- Bid Amount -->
-            <el-table-column prop="amount" label="Your Bid" width="180" align="center">
+
+            <!-- Item Name 列 -->
+            <el-table-column prop="itemName" label="Item Name" width="180" align="center">
               <template #default="scope">
-                <span>{{ scope.row.amount }}</span>
+                {{ scope.row.itemName }}
               </template>
             </el-table-column>
 
-            <!-- Timestamp -->
+            <!-- Current Highest Bid 列 -->
+            <el-table-column prop="currentHighestBid" label="Current Highest Bid" width="180" align="center">
+              <template #default="scope">
+                {{ scope.row.currentHighestBid }}
+              </template>
+            </el-table-column>
+
+            <!-- Your Bid Amount 列 -->
+            <el-table-column prop="amount" label="Your Bid" width="180" align="center">
+              <template #default="scope">
+                {{ scope.row.amount }}
+              </template>
+            </el-table-column>
+
+            <!-- Timestamp 列 -->
             <el-table-column prop="timestamp" label="Bid Time" width="180" align="center">
               <template #default="scope">
                 {{ new Date(scope.row.timestamp).toLocaleString() }}
               </template>
             </el-table-column>
 
-          </el-table>
-        </template>
-      </el-skeleton>
-    </el-card>
-
-    <!-- 购物车卡片 -->
-    <el-card class="cart-card">
-      <h2>Your Cart</h2>
-      <el-skeleton :loading="loading" animated>
-        <template #default>
-          <el-table :data="cartItems" style="width: 100%" align="center" header-align="center">
-            <el-table-column prop="itemName" label="Item Name" width="180" align="center">
-              <template #default="scope">
-                <el-link @click="goToItemDetail(scope.row.itemId)">
-                  {{ scope.row.itemName }}
-                </el-link>
-              </template>
-            </el-table-column>
-            <el-table-column prop="price" label="Price" width="100" align="center"></el-table-column>
-            <el-table-column label="Action" width="150" align="center">
-              <template #default="scope">
-                <el-button @click="removeFromCart(scope.row)" type="danger" size="small" align="center">Remove</el-button>
-              </template>
-            </el-table-column>
           </el-table>
         </template>
       </el-skeleton>
@@ -166,7 +154,8 @@ export default {
       const userId = localStorage.getItem('userId');
       try {
         const response = await axios.get(`${BACKEND_BASE_URL}/user/users/${userId}/bids`);
-        this.bids = response.data;
+        console.log('Bidding History:', response.data); // 打印数据以调试
+        this.bids = response.data;  // 更新 bids 数据结构
       } catch (error) {
         console.error('Error fetching bidding history:', error);
         this.$message.error('Failed to load bidding history');

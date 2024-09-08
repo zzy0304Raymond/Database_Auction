@@ -120,7 +120,7 @@ export default {
     minimumNextBid() {
       return this.item.currentBid > 0
         ? this.item.currentBid + this.bidIncrement
-        : this.item.startingBid;  // 使用起拍价作为初始出价
+        : this.item.startingBid + this.bidIncrement;  // 使用起拍价作为初始出价
     },
   },
   mounted() {
