@@ -2,15 +2,13 @@
   <div class="user-profile" v-if="isAuthenticated"> 
     <!-- 用户资料卡片 -->
     <el-card class="profile-card">
-      <div class="profile-header">
         <div class="profile-info">
-          <h1>User Profile</h1>
+          <h1 class="profile-title">User Profile</h1>
           <!-- 编辑资料按钮，点击时打开编辑模式 -->
           <el-button type="primary" @click="isEditing = !isEditing"> <!-- 切换编辑模式 -->
             {{ isEditing ? 'Cancel' : 'Edit Profile' }} <!-- 根据编辑状态改变按钮文字 -->
           </el-button>
         </div>
-      </div>
       <div class="user-info">
         <!-- 骨架屏组件，加载时显示占位符 -->
         <el-skeleton :loading="loading" animated>
@@ -20,26 +18,28 @@
           </template>
           <template #default>
             <!-- 根据编辑状态显示不同内容 -->
-            <div v-if="!isEditing">
+            <div v-if="!isEditing" class="user-display-info">
               <p>Username: {{ user.username }}</p>
               <p>Email: {{ user.email }}</p>
               <p>Phone: {{ user.phone }}</p>
               <p>Address: {{ user.address }}</p>
             </div>
-            <el-form v-else :model="editForm"> <!-- 编辑表单 -->
-              <el-form-item label="Username">
-                <el-input v-model="editForm.username"></el-input> 
+            <el-form  v-else :model="editForm" class="edit-form">
+              <el-form-item label="Username" class="form-item">
+                <el-input v-model="editForm.username" class="input-field"></el-input>
               </el-form-item>
-              <el-form-item label="Email">
-                <el-input v-model="editForm.email"></el-input> 
+              <el-form-item label="Email" class="form-item">
+                <el-input v-model="editForm.email" class="input-field"></el-input>
               </el-form-item>
-              <el-form-item label="Phone">
-                <el-input v-model="editForm.phone"></el-input> 
+              <el-form-item label="Phone" class="form-item">
+                <el-input v-model="editForm.phone" class="input-field"></el-input>
               </el-form-item>
-              <el-form-item label="Address">
-                <el-input v-model="editForm.address"></el-input> 
+              <el-form-item label="Address" class="form-item">
+                <el-input v-model="editForm.address" class="input-field"></el-input>
               </el-form-item>
-              <el-button type="primary" @click="saveProfile">Save</el-button> <!-- 保存按钮 -->
+              <div class="save-button-container">
+                <el-button type="primary" @click="saveProfile" class="save-button">Save</el-button>
+              </div>
             </el-form>
           </template>
         </el-skeleton>
@@ -281,14 +281,7 @@ export default {
 <style scoped>
 .profile-header {
   display: flex;
-  /* 使用 flex 布局 */
   align-items: center;
-  /* 垂直居中 */
-}
-
-.profile-info {
-  margin-left: 20px;
-  /* 左侧间距 */
 }
 
 .user-profile {
@@ -300,17 +293,73 @@ export default {
 
 .profile-card,
 .bidding-history-card,
-.cart-card,
-.pending-payment-card {
-  width: 100%;
-  max-width: 800px; /* 设置所有card的最大宽度相同 */
+.cart-card {
+  width: 60%;
+ /* max-width: 800px; /* 设置所有card的最大宽度相同 */
   margin-bottom: 20px; /* 保持卡片之间的间距 */
 }
 
+.profile-info,
 .profile-card h1,
 .bidding-history-card h2,
-.cart-card h2,
-.pending-payment-card h2 {
+.cart-card h2 {
   margin-bottom: 20px;
 }
+
+.profile-title {
+  text-align: center;
+  font-size: 24px; /* 增大标题字号 */
+}
+
+.user-display-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 将信息一行显示两个 */
+  gap: 10px; /* 信息之间的间距 */
+  font-size: 20px;
+}
+
+.el-input {
+  width: 90%; /* 控制输入框宽度，缩小编辑框 */
+  padding: 5px; /* 调整内边距使输入框变小 */
+  font-size: 16px; /* 控制输入框的字体大小 */
+  margin: 0 auto; /* 居中 */
+}
+
+.edit-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 一行两个编辑框 */
+  gap: 20px; /* 编辑框之间的间距 */
+  align-items: start; /* 使编辑框和标签顶部对齐 */
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column; /* 使表单项保持列布局 */
+  width: 100%; /* 确保宽度一致 */
+}
+
+.el-form-item label {
+  font-size: 16px; /* 增大标签字体 */
+  margin-bottom: 5px; /* 调整标签和输入框之间的间距 */
+  text-align: left; /* 标签左对齐 */
+}
+
+.input-field {
+  font-size: 16px; /* 增大输入框内容的字体 */
+  padding: 5px; /* 调整输入框的内边距 */
+}
+
+.save-button-container {
+  grid-column: span 2; /* 跨两列以居中显示 */
+  display: flex;
+  justify-content: center; /* 保存按钮居中 */
+}
+
+.save-button {
+  font-size: 14px; /* 调整按钮文字大小 */
+  padding: 8px 16px; /* 调整按钮的内边距 */
+  max-width: 120px; /* 控制按钮最大宽度 */
+}
+
+
 </style>
