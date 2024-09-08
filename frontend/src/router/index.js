@@ -36,7 +36,7 @@ const routes = [
   // { path: '/inbox', name: 'Inbox', component: Inbox },
   { path: '/chat', name: 'Chat', component: Chat },
   {
-    path: '/payment/:userId/:itemId',
+    path: '/payment/:userId/:itemId/:transactionId',
     name: 'Payment',
     component: Payment,
     props: true // 确保 userId 和 itemId 通过 props 传递到组件

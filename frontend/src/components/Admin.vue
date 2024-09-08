@@ -22,9 +22,10 @@
         </el-form-item>
         
         <!-- 图片选择器 -->
-        <div>
+        <el-form-item label="Image">
           <input type="file" @change="onFileChange" />
-        </div>
+        </el-form-item>
+
         <el-form-item>
           <el-button type="primary" :loading="isAddingItem" @click="submitNewItemForm">Add Item</el-button>
           <el-button @click="resetNewItemForm">Reset</el-button>

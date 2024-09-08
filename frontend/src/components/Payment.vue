@@ -1,127 +1,107 @@
 <template>
   <div class="payment-container">
-    <h1>Payment</h1>
 
-    <!-- 显示从商品接口获取的商品信息 -->
-    <el-card class="order-summary">
-      <h2>Order Summary</h2>
-      <p>Item: {{ product.name }}</p> <!-- 显示商品名称 -->
-      <p>Description: {{ product.description }}</p> <!-- 显示商品描述 -->
-      <p>Price: US ${{ product.price }}</p> <!-- 显示商品价格 -->
-      <p>Quantity: {{ order.quantity }}</p> <!-- 显示用户选择的数量 -->
-      <p>Total: US ${{ order.totalAmount }}</p> <!-- 计算并显示总金额 -->
-    </el-card>
-
-    <el-form :model="paymentForm" label-width="120px">
-      <!-- 信用卡支付表单 -->
-      <el-form-item label="Cardholder Name">
-        <el-input v-model="paymentForm.cardholderName" placeholder="Enter cardholder name"></el-input>
+    <!-- 支付表单 -->
+    <el-form :model="paymentForm" label-width="120px" class="payment-form">
+      <el-form-item label="持卡人姓名">
+        <el-input v-model="paymentForm.cardholderName" placeholder="请输入持卡人姓名"></el-input>
       </el-form-item>
-      
-      <el-form-item label="Card Number">
-        <el-input v-model="paymentForm.cardNumber" placeholder="Enter card number"></el-input>
+      <el-form-item label="信用卡号">
+        <el-input v-model="paymentForm.cardNumber" placeholder="请输入信用卡号"></el-input>
+      </el-form-item>
+      <el-form-item label="有效期">
+        <el-input v-model="paymentForm.expirationDate" placeholder="MM/YY"></el-input>
+      </el-form-item>
+      <el-form-item label="CVV">
+        <el-input v-model="paymentForm.cvv" placeholder="CVV" type="password"></el-input>
       </el-form-item>
 
-      <el-form-item label="Expiration Date">
-        <el-date-picker
-          v-model="paymentForm.expirationDate"
-          type="month"
-          format="MM/YY"
-          placeholder="MM/YY">
-        </el-date-picker>
-      </el-form-item>
-
-      <el-form-item label="Security Code (CVV)">
-        <el-input v-model="paymentForm.cvv" placeholder="Enter CVV" maxlength="3"></el-input>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" @click="processPayment">Pay Now</el-button>
-      </el-form-item>
+      <!-- 支付按钮 -->
+      <el-button type="primary" @click="submitPayment" :loading="isProcessing" :disabled="isProcessing">提交支付</el-button>
     </el-form>
+
+    <!-- 取消支付按钮 -->
+    <div class="cancel-section">
+      <p class="warning">一经放弃，将无法再支付本次商品。</p>
+      <el-button type="danger" @click="cancelPayment" :loading="isCancelling" :disabled="isCancelling">取消支付</el-button>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
 export default {
-  name: 'Payment',
+  props: ['userId', 'itemId', 'transactionId'], // 接收从路由传递的 userId 和 itemId
   data() {
     return {
-      order: {
-        quantity: 1, // 默认商品数量为1
-        totalAmount: 0, // 默认总金额
-      },
-      product: {
-        name: '',
-        description: '',
-        price: 0,
-      },
       paymentForm: {
         cardholderName: '',
         cardNumber: '',
         expirationDate: '',
         cvv: '',
       },
-      isProcessing: false, // 防止重复提交
+      isProcessing: false, // 控制支付按钮状态
+      isCancelling: false,  // 控制取消支付按钮状态
     };
   },
-  async created() {
-    // 从路由获取商品编号和用户编号
-    const itemId = this.$route.params.itemId;
-    const userId = this.$route.params.userId;
-
-    // 调用获取商品信息的接口
-    await this.fetchProductDetails(itemId);
-  },
   methods: {
-    async fetchProductDetails(itemId) {
-      try {
-        const response = await axios.get(`${BACKEND_BASE_URL}/Auction-items/${itemId}`);
-        this.product = response.data;
-
-        // 计算总金额（商品价格 * 数量）
-        this.order.totalAmount = this.product.price * this.order.quantity;
-      } catch (error) {
-        console.error('Error fetching product details:', error);
-        this.$message.error('Failed to fetch product details.');
-      }
-    },
-    async processPayment() {
-      if (this.isProcessing) return;
+    // 提交支付
+    async submitPayment() {
+      if (this.isProcessing) return; // 防止重复提交
       this.isProcessing = true;
 
       try {
-        // 准备支付数据
-        const paymentData = {
-          itemName: this.product.name,
-          quantity: this.order.quantity,
-          totalAmount: this.order.totalAmount,
-          cardholderName: this.paymentForm.cardholderName,
-          cardNumber: this.paymentForm.cardNumber,
-          expirationDate: this.paymentForm.expirationDate,
-          cvv: this.paymentForm.cvv,
-        };
+        // 拼接 paymentMethod 字符串，假设这是信用卡信息的格式
+        const paymentMethod = `Cardholder: ${this.paymentForm.cardholderName}, Card Number: ${this.paymentForm.cardNumber}, Expiration: ${this.paymentForm.expirationDate}, CVV: ${this.paymentForm.cvv}`;
+        console.log('Payment method:', paymentMethod); // 打印发送的支付方法
 
-        // 发送支付请求
-        const response = await axios.post(`${BACKEND_BASE_URL}/payment`, paymentData);
+        const response = await axios.post(`${BACKEND_BASE_URL}/transaction/afterpay/${this.transactionId}`, {
+          paymentMethod: paymentMethod // 确保发送的是包含 paymentMethod 字段的对象
+        }, {
+          headers: {
+            'Content-Type': 'application/json' // 使用 JSON 格式传递
+          }
+        });
 
-        // 支付成功
-        if (response.data.success) {
-          this.$message.success('Payment processed successfully!');
-          this.$router.push('/order-confirmation');
+        console.log('Payment method:', paymentMethod); // 打印发送的支付方法
+
+        if (response.status === 200) {
+          this.$message.success('支付成功！');
+          // 处理支付成功后的逻辑
+          this.$router.push('/payment-history'); // 跳转到支付历史页面
         } else {
-          this.$message.error('Payment failed. Please try again.');
+          this.$message.error('支付失败，请重试。');
         }
-
       } catch (error) {
-        console.error('Error processing payment:', error);
-        this.$message.error('An error occurred during payment. Please try again later.');
+        console.error('支付请求失败:', error);
+        this.$message.error('支付失败，请稍后重试。');
       } finally {
         this.isProcessing = false;
-        this.paymentForm.cardNumber = ''; // 清除敏感信息
-        this.paymentForm.cvv = ''; 
+      }
+    },
+
+
+    // 取消支付
+    async cancelPayment() {
+      if (this.isCancelling) return; // 防止重复操作
+      this.isCancelling = true;
+
+      try {
+        const response = await axios.get(`${BACKEND_BASE_URL}/transaction/cancel/${this.transactionId}`);
+        if (response.status === 200) {
+          this.$message.success('支付已取消');
+          this.$router.push('/payment-history'); // 跳转到支付历史页面
+        } else {
+          this.$message.error('取消支付失败，请重试。');
+        }
+      } catch (error) {
+        console.error('取消支付请求失败:', error);
+        this.$message.error('取消支付失败，请稍后重试。');
+      } finally {
+        this.isCancelling = false;
       }
     },
   },
@@ -131,17 +111,25 @@ export default {
 <style scoped>
 .payment-container {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 50px auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #fff;
   border-radius: 10px;
-}
-
-.order-summary {
-  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .el-form-item {
   margin-bottom: 20px;
+}
+
+.cancel-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.warning {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 </style>

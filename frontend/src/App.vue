@@ -46,11 +46,13 @@ export default {
             this.auctionItemId = response.data.itemId; // 将返回的数据存储为id
             this.callAnotherApi(this.auctionItemId); // 调用第二个API，传递id参数
           } else if (response.data.userId > 0 && response.data.itemId > 0) {
-            this.callAnotherApi(this.auctionItemId); // 调用第二个API，传递id参数
+            console.log("DDDDDDDDDDDD", response.data.itemId);
+            console.log("EEEEEEE",response.data);
+            this.callAnotherApi(response.data.itemId); // 调用第二个API，传递id参数
             window.alert('您当前有一笔新的待支付的订单');
           } else {
-            console.log(response.data.itemId);
-            console.log('条件未满足，继续循环，返回的ID:', this.auctionItemId);
+            console.log(response.data);
+            console.log('条件未满足，继续循环，返回的ID:', response.data.itemId);
           }
         })
         .catch(error => {
@@ -62,7 +64,7 @@ export default {
     startChecking() {
       this.checkInterval = setInterval(() => {
         this.checkCondition(); // 每次定时调用 checkCondition
-      }, 5000); // 每5秒调用一次接口
+      }, 60000); // 每60秒调用一次接口
     },
 
     // 调用第二个接口

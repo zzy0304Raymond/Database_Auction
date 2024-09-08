@@ -4,7 +4,6 @@
 
     <!-- 折扣推荐模块 -->
     <div class="discount-section">
-      <h2>今日特惠</h2>
       <el-carousel :interval="4000" arrow="always">
         <el-carousel-item v-for="(image, index) in localImages" :key="index">
           <div class="carousel-background" :style="{ backgroundImage: `url(${image})` }"></div>
