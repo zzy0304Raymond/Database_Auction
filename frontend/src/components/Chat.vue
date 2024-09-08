@@ -99,7 +99,7 @@ export default {
     // 判断是否是自己的消息
     isMyMessage(message) {
       console.log(this.userid)
-      return message.userId === parseInt(this.userid);
+      return parseInt(message.userId) === parseInt(this.userid);
     },
   },
 };
