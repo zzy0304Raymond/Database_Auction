@@ -41,7 +41,8 @@ namespace auctionapp.Controllers
                     {
                         userName = t.Buyeruser.Username,
                         itemName = t.Auction.Item.Itemname,
-                        price = t.Amount ?? 0
+                        price = t.Amount ?? 0,
+                        status = t.Status
                     }
                     )
                     .ToListAsync();
@@ -126,6 +127,8 @@ namespace auctionapp.Controllers
             public string userName { get; set; }
             public string itemName { get; set; }
             public decimal price { get; set; }
+
+            public string status { get; set; }
 
         }
 
