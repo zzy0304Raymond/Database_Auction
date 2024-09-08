@@ -41,17 +41,17 @@ export default {
     return {
       chatMessages: [], // 聊天记录
       newMessage: '', // 新消息内容
-      userid: localStorage.getItem('userId') || '', // 用户id
+      userid: localStorage.getItem('userId') || -2, // 用户id
     };
   },
   mounted() {
-    this.getChatMessages(10); // 默认获取最近10条消息
+    this.getChatMessages(50); // 默认获取最近50条消息
   },
   methods: {
     // 获取聊天记录
     async getChatMessages(n) {
       try {
-        const response = await axios.get(`${BACKEND_BASE_URL}/chat?n=${n}`);
+        const response = await axios.get(`${BACKEND_BASE_URL}/chat?count=${n}`);
         console.log('获取的聊天记录:', response.data); // 调试用，输出聊天记录
         this.chatMessages = response.data.map((msg) => ({
           ...msg,
@@ -87,11 +87,19 @@ export default {
     // 格式化时间
     formatTime(time) {
       const date = new Date(time);
-      return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+
+      // 返回 年-月-日 时:分 格式
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
     // 判断是否是自己的消息
     isMyMessage(message) {
-      return message.userId === this.userid;
+      console.log(this.userid)
+      return message.userId === parseInt(this.userid);
     },
   },
 };

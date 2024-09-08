@@ -20,27 +20,31 @@ namespace auctionapp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Chat>>> GetChats([FromQuery] int? count)
         {
-            // 获取所有聊天记录，按时间顺序排序
+            // 获取所有聊天记录，按时间倒序排序
             var chats = _context.Chats
-                .OrderBy(c => c.Chattime); // 按时间排序
+                .OrderByDescending(c => c.Chattime); // 先按时间倒序排序
 
             // 如果指定了条数，限制返回条数
             if (count.HasValue)
             {
-                chats = (IOrderedQueryable<Chat>)chats.OrderByDescending(c => c.Chattime).Take(count.Value);
+                chats = (IOrderedQueryable<Chat>)chats.Take(count.Value); // 获取最新的count条记录
             }
 
-            var chatList = await chats.Select(c => new ChatDto
-            {
-                Userid = c.Userid ?? 0,
-                Chattime = c.Chattime,
-                Content = c.Content
-            })
+            // 取到最新的记录后，再按时间正序排序
+            var chatList = await chats
+                .OrderBy(c => c.Chattime) // 按时间正序排序
+                .Select(c => new ChatDto
+                {
+                    Userid = c.Userid ?? 0,
+                    Chattime = c.Chattime,
+                    Content = c.Content
+                })
                 .ToListAsync();
 
             // 返回聊天记录
             return Ok(chatList);
         }
+
 
         // POST: /api/chat
         // 用于上传新的聊天记录
