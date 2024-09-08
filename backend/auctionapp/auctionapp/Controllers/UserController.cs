@@ -134,6 +134,8 @@ namespace auctionapp.Controllers
                 }
                 var responseDto = new UserDetailsDto
                 {
+                    address = user.Address,
+                    phone = user.Phone,
                     username = user.Username,
                     email = user.Email,
                     id = user.Userid,
@@ -202,6 +204,8 @@ namespace auctionapp.Controllers
 
                 user.Username = updateUserDto.username;
                 user.Email = updateUserDto.email;
+                user.Address = updateUserDto.address;
+                user.Phone = updateUserDto.phone;
 
 
                 _context.Entry(user).State = EntityState.Modified;
@@ -319,6 +323,9 @@ namespace auctionapp.Controllers
         }
         public class UserDetailsDto
         {
+            public string phone {  get; set; }
+            public string address { get; set; }
+
             public decimal id { get; set; }
             public string username { get; set; }
             public string email { get; set; }
@@ -336,6 +343,9 @@ namespace auctionapp.Controllers
 
         public class UpdateUserDto
         {
+            public string phone { get; set;}
+            public string address { get; set;}
+
             public string username { get; set; }
             public string email { get; set; }
 
