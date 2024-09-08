@@ -24,7 +24,8 @@ export default {
         { index: '3', name: 'Register', route: '/register' },
         { index: '4', name: 'Profile', route: '/profile' },
         { index: '5', name: 'Admin', route: '/admin' },
-        { index: '6', name: 'UserManual', route: '/manual' },
+        { index: '6', name: 'PaymentHistory', route: '/payment-history' },
+        { index: '7', name: 'UserManual', route: '/manual' },
       ],
       checkInterval: null, // 定时器ID
       auctionItemId: null, // 存储返回的ID
@@ -45,11 +46,8 @@ export default {
             this.auctionItemId = response.data.itemId; // 将返回的数据存储为id
             this.callAnotherApi(this.auctionItemId); // 调用第二个API，传递id参数
           } else if (response.data.userId > 0 && response.data.itemId > 0) {
-            // 当 userId > 0 且 itemId > 0 时，跳转到 Payment 页面
-            this.$router.push({
-              name: 'Payment',
-              params: { userId: response.data.userId, itemId: response.data.itemId } // 通过 params 传递 userId 和 itemId
-            });
+            this.callAnotherApi(this.auctionItemId); // 调用第二个API，传递id参数
+            window.alert('您当前有一笔新的待支付的订单');
           } else {
             console.log(response.data.itemId);
             console.log('条件未满足，继续循环，返回的ID:', this.auctionItemId);

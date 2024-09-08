@@ -12,6 +12,7 @@ import Payment from '../components/Payment.vue';
 import UserManual from '../components/UserManual.vue'; // 导入 UserManual 组件
 // import SellItem from '../components/SellItem.vue'; // 导入 SellItem 组件
 import Brand from '../components/Brand.vue';  // 导入 Brand 组件
+import PaymentHistory from '../components/PaymentHistory.vue'; // 导入 PaymentHistory 组件
 
 
 const routes = [
@@ -39,6 +40,12 @@ const routes = [
     name: 'Payment',
     component: Payment,
     props: true // 确保 userId 和 itemId 通过 props 传递到组件
+  },
+  { 
+    path: '/payment-history', 
+    name: 'PaymentHistory', 
+    component: PaymentHistory, 
+    meta: { requiresAuth: true }  // 需要登录才能查看支付记录 
   },
   // { path: '/sell', name: 'SellItem', component: SellItem }, // 添加卖出商品的路由
   { path: '/manual', name: 'UserManual', component: UserManual }, // 添加使用手册的路由

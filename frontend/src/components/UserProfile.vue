@@ -46,29 +46,24 @@
           <el-skeleton-item variant="text"></el-skeleton-item>
         </template>
         <template #default>
-          <el-table :data="bids" style="width: 100%">
-            <el-table-column prop="itemName" label="Item Name" width="180"></el-table-column> 
-            <el-table-column prop="amount" label="Your Bid" width="180"></el-table-column> 
-            <el-table-column prop="currentPrice" label="Current Price" width="180"></el-table-column>
-            <el-table-column prop="endtime" label="End Time"></el-table-column>
-            <el-table-column label="Action" width="150">
+          <el-table :data="bids" style="width: 100%" align="center" header-align="center">
+            <!-- Item ID -->
+            <el-table-column prop="itemId" label="Item ID" width="180" align="center"></el-table-column>
+            
+            <!-- Bid Amount -->
+            <el-table-column prop="amount" label="Your Bid" width="180" align="center">
               <template #default="scope">
-                <!-- 判断Endtime是否已到，决定显示内容 -->
-                <div v-if="new Date() >= new Date(scope.row.endtime)">
-                  <el-button v-if="scope.row.status === 'Pending Payment'" 
-                             type="primary" 
-                             size="small" 
-                             @click="goToPayment(scope.row)">
-                    Pay Now
-                  </el-button>
-                </div>
-                <div v-else>
-                  <p>Your Bid: {{ scope.row.amount }}</p>
-                  <p>Current Price: {{ scope.row.currentPrice }}</p>
-                  <p>Check if you need to increase your bid.</p>
-                </div>
+                <span>{{ scope.row.amount }}</span>
               </template>
             </el-table-column>
+
+            <!-- Timestamp -->
+            <el-table-column prop="timestamp" label="Bid Time" width="180" align="center">
+              <template #default="scope">
+                {{ new Date(scope.row.timestamp).toLocaleString() }}
+              </template>
+            </el-table-column>
+
           </el-table>
         </template>
       </el-skeleton>
@@ -79,18 +74,18 @@
       <h2>Your Cart</h2>
       <el-skeleton :loading="loading" animated>
         <template #default>
-          <el-table :data="cartItems" style="width: 100%">
-            <el-table-column prop="itemName" label="Item Name" width="180">
+          <el-table :data="cartItems" style="width: 100%" align="center" header-align="center">
+            <el-table-column prop="itemName" label="Item Name" width="180" align="center">
               <template #default="scope">
                 <el-link @click="goToItemDetail(scope.row.itemId)">
                   {{ scope.row.itemName }}
                 </el-link>
               </template>
             </el-table-column>
-            <el-table-column prop="price" label="Price" width="100"></el-table-column>
-            <el-table-column label="Action" width="150">
+            <el-table-column prop="price" label="Price" width="100" align="center"></el-table-column>
+            <el-table-column label="Action" width="150" align="center">
               <template #default="scope">
-                <el-button @click="removeFromCart(scope.row)" type="danger" size="small">Remove</el-button>
+                <el-button @click="removeFromCart(scope.row)" type="danger" size="small" align="center">Remove</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -238,20 +233,20 @@ export default {
       this.$router.push({ name: 'Login' });
     },
 
-    // async fetchPendingPayments() {
-    //   const userId = localStorage.getItem('userId');
-    //   try {
-    //     const response = await axios.get(`${BACKEND_BASE_URL}/user/users/${userId}/pending-payments`);
-    //     this.pendingPayments = response.data.map(item => ({
-    //       itemName: item.itemName,
-    //       price: item.price,
-    //       orderId: item.orderId,
-    //     }));
-    //   } catch (error) {
-    //     console.error('Error fetching pending payments:', error);
-    //     this.$message.error('Failed to load pending payments');
-    //   }
-    // },
+    async fetchPendingPayments() {
+      // const userId = localStorage.getItem('userId');
+      // try {
+      //   const response = await axios.get(`${BACKEND_BASE_URL}/user/users/${userId}/pending-payments`);
+      //   this.pendingPayments = response.data.map(item => ({
+      //     itemName: item.itemName,
+      //     price: item.price,
+      //     orderId: item.orderId,
+      //   }));
+      // } catch (error) {
+      //   console.error('Error fetching pending payments:', error);
+      //   this.$message.error('Failed to load pending payments');
+      // }
+    },
 
     goToPayment(order) {
       this.$router.push({ name: 'Payment', params: { orderId: order.orderId } });
