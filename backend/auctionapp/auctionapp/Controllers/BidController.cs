@@ -41,6 +41,10 @@ namespace auctionapp.Controllers
                 var auction = await _context.Auctions
                     .Include(auction => auction.Bidrecords)
                     .FirstOrDefaultAsync(auction => auction.Itemid == bidData.itemId);
+                if(auction.Currenthighestbid>bidData.bidAmount)
+                {
+                    return BadRequest("It's not the current highest Bid, Refresh needed!");
+                }
 
                 auction.Currenthighestbiduserid = bidData.userId;
 
