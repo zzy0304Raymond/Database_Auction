@@ -44,6 +44,8 @@ namespace auctionapp.Controllers
 
                 auction.Currenthighestbiduserid = bidData.userId;
 
+                auction.Currenthighestbid = bidData.bidAmount;
+
                 _context.Auctions.Update(auction);
 
                 await _context.SaveChangesAsync();
