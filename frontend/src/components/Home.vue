@@ -21,19 +21,17 @@
           <el-button icon="el-icon-search" @click="searchItems">Search</el-button>
         </template>
       </el-input>
-      
+
       <!-- 分类过滤器 -->
       <el-select v-model="selectedCategory" placeholder="Select Category" class="filter-bar">
         <el-option label="All Categories" value=""></el-option>
         <el-option label="painting" value="painting"></el-option>
-        <el-option label="jewlry" value="jewlry"></el-option>
+        <el-option label="jewelry" value="jewelry"></el-option>
         <el-option label="watch" value="watch"></el-option>
         <el-option label="antique" value="antique"></el-option>
+        <el-option label="IT" value="IT"></el-option>
       </el-select>
     </div>
-
-
-
 
     <!-- 拍卖物品列表 -->
     <el-row :gutter="20" class="auction-list">
