@@ -385,6 +385,7 @@ namespace auctionapp.Controllers
                     .Select(record => new
                     {
                         bidderId = record.Userid,
+                        userName = record.User.Username,
                         amount = record.Bidamount,
                         timestamp = record.Bidtime.Value.ToString("o") // ISO 8601 格式
                     })
